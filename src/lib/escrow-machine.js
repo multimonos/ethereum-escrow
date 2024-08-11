@@ -14,11 +14,12 @@ export const escrowMachine = {
     id: 'escrow_machine',
     initial: 'loading',
 
-    context: {
+    context: ( { input } ) => ({
         network: null,
-        networkId: 'anvil',
+        networkId: input.networkId,
+        error: false,
         accounts: []
-    },
+    }),
 
     states: {
 
@@ -38,7 +39,7 @@ export const escrowMachine = {
                     const { data } = await res.json()
                     // network
                     const network = findNetwork( input.networkId )
-                    await setNetworkStatus(network)
+                    await setNetworkStatus( network )
                     // init
                     return {
                         accounts: data,
