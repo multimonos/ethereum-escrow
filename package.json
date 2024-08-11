@@ -4,6 +4,7 @@
 	"private": true,
 	"scripts": {
 		"dev": "vite dev",
+		"anvil": "anvil && sleep 5",
 		"build": "vite build",
 		"preview": "vite preview",
 		"test:unit": "vitest --passWithNoTests",

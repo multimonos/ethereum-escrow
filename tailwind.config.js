@@ -10,6 +10,6 @@ export default {
         addDynamicIconSelectors()
     ],
     daisyui: {
-        themes: [ "bumblebee" ]
+        themes: [ "emerald" ]
     }
 }
