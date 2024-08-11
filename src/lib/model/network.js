@@ -52,7 +52,7 @@ export const networkIsUp = async ( url ) => {
             body: JSON.stringify( {
                 jsonrpc: '2.0',
                 id: 1,
-                method: 'eth_blockNumber',
+                method: 'eth_chainId',
                 params: []
             } )
         } )

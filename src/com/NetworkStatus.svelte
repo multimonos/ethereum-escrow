@@ -12,18 +12,18 @@ $:network = findNetwork( id )
 
 // fns
 const refreshNetwork = async () => {
-    network.refreshStatus()
+    await network.refreshStatus()
     network = network
-    // console.log( { network } )
 }
 
 const cancelNetworkRefresh = () => {
     if ( interval ) clearInterval( interval )
 }
 
-onMount( () => {
+onMount( async () => {
     refreshNetwork()
     interval = setInterval( refreshNetwork, frequency )
+
 } )
 </script>
 <div data-tid="network-status" class="flex items-center gap-1">
