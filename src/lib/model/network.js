@@ -39,9 +39,6 @@ const networks = [
 export const findNetwork = id =>
     networks.find( network => network.id === id )
 
-export const getAnvilNetwork = () =>
-    findNetwork( 'anvil' )
-
 export const networkIsUp = async ( url ) => {
     try {
         const res = await fetch( url, {
