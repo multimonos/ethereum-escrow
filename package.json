@@ -9,10 +9,12 @@
 		"preview": "vite preview",
 		"test:unit": "vitest --passWithNoTests",
 		"test:e2e": "npx cypress open --e2e --browser=electron",
-		"test:sol": "forge test --mc 'Escrow*' --watch -vv"
+		"test:sol": "forge test --mc 'Escrow*' --watch -vv",
+		"send:ether": "cast send $ANVIL1_ADDRESS --value=25ether --private-key=$ANVIL0_PKEY"
 	},
 	"devDependencies": {
 		"@iconify-json/solar": "^1.1.10",
+		"@iconify-json/token": "^1.1.9",
 		"@iconify/tailwind": "^1.1.1",
 		"@sveltejs/adapter-auto": "^3.2.2",
 		"@sveltejs/kit": "^2.5.18",
