@@ -9,6 +9,7 @@ import NetworkStatus from "../com/NetworkStatus.svelte";
 import { modelOptionsForSelect } from "$lib/form.js";
 import Select from "../com/form/Select.svelte";
 import StackedLayout from "../com/card/StackedLayout.svelte";
+import {abi,bytecode} from "../sol/Escrow.json"
 
 
 // state mgmt
@@ -19,6 +20,8 @@ const machine = setup( {} ).createMachine( escrowMachine )
 const { snapshot, send } = useMachine( machine, {
     // inspect,
     input: {
+        contractAbi: abi,
+        contractBytecode: bytecode,
         networkId,
     }
 } )
@@ -60,10 +63,10 @@ const onChangeAmount = e => {
 }
 
 const onReset = () => {
-    arbiter=""
-    beneficiary=""
-    amount=0
-    emitSetContract({arbiter,beneficiary,amount})
+    arbiter = ""
+    beneficiary = ""
+    amount = 0
+    emitSetContract( { arbiter, beneficiary, amount } )
 }
 </script>
 
@@ -113,7 +116,7 @@ const onReset = () => {
                             type="range"
                             name="amount"
                             min="0"
-                            max="1000"
+                            max="10"
                             step="1"
                             class="range range-xs"
                             on:change={onChangeAmount}
@@ -124,12 +127,12 @@ const onReset = () => {
                         </div>
                     </div>
 
-                    <div class="flex gap-2">
+                    <div class="flex gap-2 my-8">
                         <button
-                            disabled={!$snapshot.can({type:'create'})}
-                            on:click={()=>send({type:'create'})}
+                            disabled={!$snapshot.can({type:'deploy'})}
+                            on:click={()=>send({type:'deploy'})}
                             class="btn btn-primary">
-                            Submit
+                            Deploy
                         </button>
                         <button
                             disabled={!$snapshot.can({type:'approve'})}
@@ -150,5 +153,8 @@ const onReset = () => {
     </StackedLayout>
 {/if}
 <pre>local:{JSON.stringify( contract, null, 4 )}</pre>
-<pre>context:{JSON.stringify( $snapshot.context, null, 4 )}</pre>
-<pre>{JSON.stringify( $snapshot.value, null, 4 )}</pre>
+<pre>error:{JSON.stringify( $snapshot.context, null, 4 )}</pre>
+<pre>error:{JSON.stringify( $snapshot.context.error, null, 4 )}</pre>
+<pre>addre:{JSON.stringify( $snapshot.context.contractAddress, null, 4 )}</pre>
+<pre>error:{JSON.stringify( $snapshot.value, null, 4 )}</pre>
+<!--<pre>{JSON.stringify( $snapshot.value, null, 4 )}</pre>-->

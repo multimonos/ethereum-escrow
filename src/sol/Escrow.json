@@ -1,0 +1,256 @@
+{
+  "abi": [
+    {
+      "type": "constructor",
+      "inputs": [
+        {
+          "name": "arbiter_",
+          "type": "address",
+          "internalType": "address"
+        },
+        {
+          "name": "beneficiary_",
+          "type": "address",
+          "internalType": "address"
+        }
+      ],
+      "stateMutability": "payable"
+    },
+    {
+      "type": "function",
+      "name": "approve",
+      "inputs": [],
+      "outputs": [],
+      "stateMutability": "nonpayable"
+    },
+    {
+      "type": "function",
+      "name": "arbiter",
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "",
+          "type": "address",
+          "internalType": "address"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "beneficiary",
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "",
+          "type": "address",
+          "internalType": "address"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "depositor",
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "",
+          "type": "address",
+          "internalType": "address"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "isApproved",
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "",
+          "type": "bool",
+          "internalType": "bool"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "event",
+      "name": "Approved",
+      "inputs": [
+        {
+          "name": "balance",
+          "type": "uint256",
+          "indexed": false,
+          "internalType": "uint256"
+        }
+      ],
+      "anonymous": false
+    },
+    {
+      "type": "error",
+      "name": "ArbiterOnly",
+      "inputs": []
+    }
+  ],
+  "bytecode": {
+    "object": "0x60806040526040516102b23803806102b28339810160408190526100229161007a565b600080546001600160a01b03199081163317909155600280546001600160a01b03948516908316179055600180549290931691161790556100ad565b80516001600160a01b038116811461007557600080fd5b919050565b6000806040838503121561008d57600080fd5b6100968361005e565b91506100a46020840161005e565b90509250929050565b6101f6806100bc6000396000f3fe608060405234801561001057600080fd5b50600436106100575760003560e01c806312424e3f1461005c57806328f371aa1461006657806338af3eed1461008f578063c7c4ff46146100ba578063fe25e00a146100cd575b600080fd5b6100646100e0565b005b60025461007a90600160a01b900460ff1681565b60405190151581526020015b60405180910390f35b6001546100a2906001600160a01b031681565b6040516001600160a01b039091168152602001610086565b6000546100a2906001600160a01b031681565b6002546100a2906001600160a01b031681565b6002546001600160a01b0316331461010b5760405163d14f869f60e01b815260040160405180910390fd5b60015460405147916000916001600160a01b039091169083908381818185875af1925050503d806000811461015c576040519150601f19603f3d011682016040523d82523d6000602084013e610161565b606091505b505090508061016f57600080fd5b6002805460ff60a01b1916600160a01b1790556040517f3ad93af63cb7967b23e4fb500b7d7d28b07516325dcf341f88bebf959d82c1cb906101b49084815260200190565b60405180910390a1505056fea264697066735822122051b73c34bcb3ec3d359a11c1bce0196724b74d8637e1230cad3d38ccd49ae58264736f6c63430008140033",
+    "sourceMap": "121:794:23:-:0;;;493:163;;;;;;;;;;;;;;;;;;:::i;:::-;563:9;:22;;-1:-1:-1;;;;;;563:22:23;;;575:10;563:22;;;;595:7;:18;;-1:-1:-1;;;;;595:18:23;;;;;;;;;563:22;623:26;;;;;;;;;;;121:794;;14:177:25;93:13;;-1:-1:-1;;;;;135:31:25;;125:42;;115:70;;181:1;178;171:12;115:70;14:177;;;:::o;196:293::-;275:6;283;336:2;324:9;315:7;311:23;307:32;304:52;;;352:1;349;342:12;304:52;375:40;405:9;375:40;:::i;:::-;365:50;;434:49;479:2;468:9;464:18;434:49;:::i;:::-;424:59;;196:293;;;;;:::o;:::-;121:794:23;;;;;;",
+    "linkReferences": {}
+  },
+  "deployedBytecode": {
+    "object": "0x608060405234801561001057600080fd5b50600436106100575760003560e01c806312424e3f1461005c57806328f371aa1461006657806338af3eed1461008f578063c7c4ff46146100ba578063fe25e00a146100cd575b600080fd5b6100646100e0565b005b60025461007a90600160a01b900460ff1681565b60405190151581526020015b60405180910390f35b6001546100a2906001600160a01b031681565b6040516001600160a01b039091168152602001610086565b6000546100a2906001600160a01b031681565b6002546100a2906001600160a01b031681565b6002546001600160a01b0316331461010b5760405163d14f869f60e01b815260040160405180910390fd5b60015460405147916000916001600160a01b039091169083908381818185875af1925050503d806000811461015c576040519150601f19603f3d011682016040523d82523d6000602084013e610161565b606091505b505090508061016f57600080fd5b6002805460ff60a01b1916600160a01b1790556040517f3ad93af63cb7967b23e4fb500b7d7d28b07516325dcf341f88bebf959d82c1cb906101b49084815260200190565b60405180910390a1505056fea264697066735822122051b73c34bcb3ec3d359a11c1bce0196724b74d8637e1230cad3d38ccd49ae58264736f6c63430008140033",
+    "sourceMap": "121:794:23:-:0;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;662:250;;;:::i;:::-;;318:22;;;;;-1:-1:-1;;;318:22:23;;;;;;;;;179:14:25;;172:22;154:41;;142:2;127:18;318:22:23;;;;;;;;258:26;;;;;-1:-1:-1;;;;;258:26:23;;;;;;-1:-1:-1;;;;;370:32:25;;;352:51;;340:2;325:18;258:26:23;206:203:25;228:24:23;;;;;-1:-1:-1;;;;;228:24:23;;;290:22;;;;;-1:-1:-1;;;;;290:22:23;;;662:250;421:7;;-1:-1:-1;;;;;421:7:23;407:10;:21;403:47;;437:13;;-1:-1:-1;;;437:13:23;;;;;;;;;;;403:47;778:11:::1;::::0;:39:::1;::::0;729:21:::1;::::0;711:15:::1;::::0;-1:-1:-1;;;;;778:11:23;;::::1;::::0;729:21;;711:15;778:39;711:15;778:39;729:21;778:11;:39:::1;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;760:57;;;835:7;827:16;;;::::0;::::1;;853:10;:17:::0;;-1:-1:-1;;;;853:17:23::1;-1:-1:-1::0;;;853:17:23::1;::::0;;885:20:::1;::::0;::::1;::::0;::::1;::::0;894:10;770:25:25;;758:2;743:18;;624:177;885:20:23::1;;;;;;;;701:211;;662:250::o:0",
+    "linkReferences": {}
+  },
+  "methodIdentifiers": {
+    "approve()": "12424e3f",
+    "arbiter()": "fe25e00a",
+    "beneficiary()": "38af3eed",
+    "depositor()": "c7c4ff46",
+    "isApproved()": "28f371aa"
+  },
+  "rawMetadata": "{\"compiler\":{\"version\":\"0.8.20+commit.a1b79de6\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"arbiter_\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"beneficiary_\",\"type\":\"address\"}],\"stateMutability\":\"payable\",\"type\":\"constructor\"},{\"inputs\":[],\"name\":\"ArbiterOnly\",\"type\":\"error\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"balance\",\"type\":\"uint256\"}],\"name\":\"Approved\",\"type\":\"event\"},{\"inputs\":[],\"name\":\"approve\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"arbiter\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"beneficiary\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"depositor\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"isApproved\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"src/sol/Escrow.sol\":\"Escrow\"},\"evmVersion\":\"paris\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[\":forge-std/=lib/forge-std/src/\"]},\"sources\":{\"src/sol/Escrow.sol\":{\"keccak256\":\"0xeb9911c45bea0b3d91c58fd63cdee932056525942866d78e2226ef17edc7c076\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://f80e17e38be3a3d8263ace1f650c8cd1b60b2e21362421da4978642b2cd19df7\",\"dweb:/ipfs/QmQL12tdKJvVDPa5L53gZXGgx5coomnwqLJbkdEo9ZhQcv\"]}},\"version\":1}",
+  "metadata": {
+    "compiler": {
+      "version": "0.8.20+commit.a1b79de6"
+    },
+    "language": "Solidity",
+    "output": {
+      "abi": [
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "arbiter_",
+              "type": "address"
+            },
+            {
+              "internalType": "address",
+              "name": "beneficiary_",
+              "type": "address"
+            }
+          ],
+          "stateMutability": "payable",
+          "type": "constructor"
+        },
+        {
+          "inputs": [],
+          "type": "error",
+          "name": "ArbiterOnly"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "uint256",
+              "name": "balance",
+              "type": "uint256",
+              "indexed": false
+            }
+          ],
+          "type": "event",
+          "name": "Approved",
+          "anonymous": false
+        },
+        {
+          "inputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function",
+          "name": "approve"
+        },
+        {
+          "inputs": [],
+          "stateMutability": "view",
+          "type": "function",
+          "name": "arbiter",
+          "outputs": [
+            {
+              "internalType": "address",
+              "name": "",
+              "type": "address"
+            }
+          ]
+        },
+        {
+          "inputs": [],
+          "stateMutability": "view",
+          "type": "function",
+          "name": "beneficiary",
+          "outputs": [
+            {
+              "internalType": "address",
+              "name": "",
+              "type": "address"
+            }
+          ]
+        },
+        {
+          "inputs": [],
+          "stateMutability": "view",
+          "type": "function",
+          "name": "depositor",
+          "outputs": [
+            {
+              "internalType": "address",
+              "name": "",
+              "type": "address"
+            }
+          ]
+        },
+        {
+          "inputs": [],
+          "stateMutability": "view",
+          "type": "function",
+          "name": "isApproved",
+          "outputs": [
+            {
+              "internalType": "bool",
+              "name": "",
+              "type": "bool"
+            }
+          ]
+        }
+      ],
+      "devdoc": {
+        "kind": "dev",
+        "methods": {},
+        "version": 1
+      },
+      "userdoc": {
+        "kind": "user",
+        "methods": {},
+        "version": 1
+      }
+    },
+    "settings": {
+      "remappings": [
+        "forge-std/=lib/forge-std/src/"
+      ],
+      "optimizer": {
+        "enabled": true,
+        "runs": 200
+      },
+      "metadata": {
+        "bytecodeHash": "ipfs"
+      },
+      "compilationTarget": {
+        "src/sol/Escrow.sol": "Escrow"
+      },
+      "evmVersion": "paris",
+      "libraries": {}
+    },
+    "sources": {
+      "src/sol/Escrow.sol": {
+        "keccak256": "0xeb9911c45bea0b3d91c58fd63cdee932056525942866d78e2226ef17edc7c076",
+        "urls": [
+          "bzz-raw://f80e17e38be3a3d8263ace1f650c8cd1b60b2e21362421da4978642b2cd19df7",
+          "dweb:/ipfs/QmQL12tdKJvVDPa5L53gZXGgx5coomnwqLJbkdEo9ZhQcv"
+        ],
+        "license": "MIT"
+      }
+    },
+    "version": 1
+  },
+  "id": 23
+}

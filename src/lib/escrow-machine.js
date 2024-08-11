@@ -1,4 +1,5 @@
 import { assign, fromPromise } from "xstate";
+import { ethers } from "ethers";
 import { findNetwork, setNetworkStatus } from "$lib/model/network.js";
 
 export const gotEvent = ( { event } ) => {
@@ -15,20 +16,22 @@ export const escrowMachine = {
     initial: 'loading',
 
     context: ( { input } ) => ({
+        error: false,
+        contractAddress: null,
         contract: {
             arbiter: "",
             beneficiary: "",
             amount: 0
         },
-        network: null,
         networkId: input.networkId,
-        error: false,
+        network: null,
+        contractAbi: input.contractAbi || null,
+        contractBytecode: input.contractBytecode || null,
         accounts: []
     }),
 
     states: {
 
-        error: {},
 
         loading: {
             entry: [ logState( 'loading' ) ],
@@ -84,6 +87,15 @@ export const escrowMachine = {
                         },
                     },
                     states: {
+
+                        error: {
+                            after: {
+                                3000: {
+                                    target: 'validating'
+                                }
+                            },
+                            exit: assign( { error: false } )
+                        },
                         validating: {
                             always: {
                                 guard: ( { context } ) => {
@@ -96,19 +108,140 @@ export const escrowMachine = {
                         },
                         valid: {
                             on: {
-                                create: {
-                                    actions: () => console.log( 'createing' ),
-                                    target: 'created',
+                                deploy: {
+                                    actions: () => console.log( 'deploy' ),
+                                    target: 'deploying',
                                 }
                             }
                         },
-                        created: {
-                            on: {
-                                approve: {
-                                    actions: () => console.log( 'approved' ),
-                                    target: 'approved'
+                        deploying: {
+                            invoke: {
+                                input: ( { context } ) => ({
+                                    arbiter: context.contract.arbiter,
+                                    beneficiary: context.contract.beneficiary,
+                                    amount: context.contract.amount,
+                                    abi: context.contractAbi,
+                                    bytecode: context.contractBytecode,
+                                }),
+                                src: fromPromise( async ( { input } ) => {
+
+                                    const {
+                                        arbiter,
+                                        beneficiary,
+                                        amount,
+                                        abi,
+                                        bytecode,
+                                    } = input
+
+                                    const value = ethers.parseEther( amount ).toString()
+                                    console.log( { arbiter, beneficiary, value } )
+
+                                    const browserProvider = new ethers.BrowserProvider( window.ethereum )
+                                    console.log( { browserProvider } )
+
+                                    const signer = await browserProvider.getSigner()
+                                    console.log( { signer } )
+
+                                    const factory = new ethers.ContractFactory(
+                                        abi,
+                                        bytecode,
+                                        signer
+                                    )
+                                    console.log( { factory } )
+
+                                    const contract = await factory.deploy( arbiter, beneficiary, { value } )
+                                    console.log( { contract } )
+
+                                    const receipt = await contract.waitForDeployment()
+                                    console.log( { contract, receipt } )
+
+                                    const contractAddress = contract.target
+
+                                    return { contractAddress }
+
+                                } ),
+                                onDone: {
+                                    actions: [
+                                        assign( { contractAddress: ( { event } ) => event.output.contractAddress } )
+                                    ],
+                                    target: 'deployed',
+                                },
+                                onError: {
+                                    target: 'error',
+                                    actions: [
+                                        err => console.log( 'errr', { err } ),
+                                        assign( { error: ( { event } ) => event.error.shortMessage } ),
+                                    ],
                                 }
                             }
+
+                        },
+                        deployed: {
+                            on: {
+                                approve: {
+                                    actions: [
+                                        () => console.log( 'approved' ),
+                                    ],
+                                    target: 'approving'
+                                }
+                            }
+                        },
+                        approving: {
+                            invoke: {
+                                input: ( { context } ) => ({
+                                    arbiter: context.contract.arbiter,
+                                    abi: context.contractAbi,
+                                    contractAddress: context.contractAddress
+                                }),
+                                src: fromPromise( async ( { input } ) => {
+
+                                    const {
+                                        arbiter,
+                                        abi,
+                                        contractAddress,
+                                    } = input
+
+
+                                    const browserProvider = new ethers.BrowserProvider( window.ethereum )
+                                    console.log( 'approve', { browserProvider } )
+
+                                    const signer = await browserProvider.getSigner()
+                                    console.log( 'approve', { signer } )
+
+                                    const contract = new ethers.Contract(
+                                        contractAddress,
+                                        abi,
+                                        signer
+                                    )
+                                    console.log( 'approve', { contract } )
+
+                                    const tx = await contract.approve()
+                                    const receipt = await tx.wait()
+
+                                    // update
+                                    const res = await fetch( `/api/accounts` )
+                                    const json = await res.json()
+                                    const accounts = json.data
+                                    console.log( 'approve', { accounts } )
+
+                                    return { accounts }
+
+                                } ),
+                                onDone: {
+                                    actions: [
+                                        assign( { accounts: ( { event } ) => event.output.accounts } )
+                                    ],
+                                    target: 'approved',
+                                },
+                                onError: {
+                                    target: 'error',
+                                    actions: [
+                                        err => console.log( 'errr', { err } ),
+                                        assign( { error: ( { event } ) => event.error.shortMessage } ),
+                                    ],
+                                }
+                            }
+
                         },
                         approved: {}
                     }
