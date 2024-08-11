@@ -2,19 +2,14 @@ export const createNetwork = (
     {
         id = '',
         name = '',
-        url = ''
+        url = '',
+        available = false,
     } = {} ) => (
     {
         id,
         name,
         url,
-        status: 'unknown',
-        isAvailable() {
-            return this.status === 'up'
-        },
-        async refreshStatus() {
-            this.status = await networkIsUp( this.url ) ? 'up' : 'down'
-        }
+        available,
     }
 )
 
@@ -39,9 +34,10 @@ const networks = [
 export const findNetwork = id =>
     networks.find( network => network.id === id )
 
-export const networkIsUp = async ( url ) => {
+export const setNetworkStatus = async ( network ) => {
+
     try {
-        const res = await fetch( url, {
+        const res = await fetch( network.url, {
             method: 'post',
             headers: {
                 'content-type': 'application/json',
@@ -53,11 +49,14 @@ export const networkIsUp = async ( url ) => {
                 params: []
             } )
         } )
-        return res.ok
+
+        network.available = res.ok
 
     } catch ( err ) {
-        return false
+        network.available = false
     }
+
+    return network
 }
 
 export const createNetworkOptions = ( selectedId ) =>
