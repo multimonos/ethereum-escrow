@@ -15,6 +15,11 @@ export const escrowMachine = {
     initial: 'loading',
 
     context: ( { input } ) => ({
+        contract: {
+            arbiter: "",
+            beneficiary: "",
+            amount: 0
+        },
         network: null,
         networkId: input.networkId,
         error: false,
@@ -63,20 +68,64 @@ export const escrowMachine = {
             type: 'parallel',
             states: {
                 ready: {
-                    initial: 'idle',
+                    initial: 'validating',
+                    on: {
+                        "set_contract": {
+                            actions: [
+                                gotEvent,
+                                assign( {
+                                    contract: ( { event } ) => {
+                                        console.log( 'connnnnnnnnn', { event } )
+                                        return { ...event.contract }
+                                    }
+                                } )
+                            ],
+                            target: 'ready.validating'
+                        },
+                    },
                     states: {
-                        idle: {}
+                        validating: {
+                            always: {
+                                guard: ( { context } ) => {
+                                    return context.contract.arbiter !== ''
+                                        && context.contract.beneficiary !== ''
+                                        && context.contract.amount > 0
+                                },
+                                target: 'valid',
+                            }
+                        },
+                        valid: {
+                            on: {
+                                create: {
+                                    actions: () => console.log( 'createing' ),
+                                    target: 'created',
+                                }
+                            }
+                        },
+                        created: {
+                            on: {
+                                approve: {
+                                    actions: () => console.log( 'approved' ),
+                                    target: 'approved'
+                                }
+                            }
+                        },
+                        approved: {}
                     }
                 },
                 network: {
                     initial: 'idle',
                     states: {
                         idle: {
-                            entry: [ logState( 'network.idle' ) ],
+                            entry: [
+                                // logState( 'network.idle' )
+                            ],
                             after: { 2500: { target: 'refreshing' } }
                         },
                         refreshing: {
-                            entry: [ logState( 'network.refreshing' ) ],
+                            entry: [
+                                // logState( 'network.refreshing' )
+                            ],
                             invoke: {
                                 input: ( { context } ) => ({ network: context.network }),
                                 src: fromPromise( async ( { input } ) => {
