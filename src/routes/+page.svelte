@@ -117,7 +117,7 @@ const onReset = () => {
                             name="amount"
                             min="0"
                             max="10"
-                            step="1"
+                            step=".25"
                             class="range range-xs"
                             on:change={onChangeAmount}
                             bind:value={amount}

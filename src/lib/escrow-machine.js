@@ -90,7 +90,7 @@ export const escrowMachine = {
 
                         error: {
                             after: {
-                                3000: {
+                                30000: {
                                     target: 'validating'
                                 }
                             },
@@ -122,6 +122,7 @@ export const escrowMachine = {
                                     amount: context.contract.amount,
                                     abi: context.contractAbi,
                                     bytecode: context.contractBytecode,
+                                    dbg: false,
                                 }),
                                 src: fromPromise( async ( { input } ) => {
 
@@ -131,29 +132,30 @@ export const escrowMachine = {
                                         amount,
                                         abi,
                                         bytecode,
+                                        dbg,
                                     } = input
 
                                     const value = ethers.parseEther( amount ).toString()
-                                    console.log( { arbiter, beneficiary, value } )
+                                    dbg && console.log( { arbiter, beneficiary, value } )
 
                                     const browserProvider = new ethers.BrowserProvider( window.ethereum )
-                                    console.log( { browserProvider } )
+                                    dbg && console.log( { browserProvider } )
 
                                     const signer = await browserProvider.getSigner()
-                                    console.log( { signer } )
+                                    dbg && console.log( { signer } )
 
                                     const factory = new ethers.ContractFactory(
                                         abi,
                                         bytecode,
                                         signer
                                     )
-                                    console.log( { factory } )
+                                    dbg && console.log( { factory } )
 
                                     const contract = await factory.deploy( arbiter, beneficiary, { value } )
-                                    console.log( { contract } )
+                                    dbg && console.log( { contract } )
 
                                     const receipt = await contract.waitForDeployment()
-                                    console.log( { contract, receipt } )
+                                    dbg && console.log( { contract, receipt } )
 
                                     const contractAddress = contract.target
 
@@ -170,7 +172,7 @@ export const escrowMachine = {
                                     target: 'error',
                                     actions: [
                                         err => console.log( 'errr', { err } ),
-                                        assign( { error: ( { event } ) => event.error.shortMessage } ),
+                                        assign( { error: ( { event } ) => event.error.message } ),
                                     ],
                                 }
                             }
@@ -189,6 +191,7 @@ export const escrowMachine = {
                         approving: {
                             invoke: {
                                 input: ( { context } ) => ({
+                                    dbg: false,
                                     arbiter: context.contract.arbiter,
                                     abi: context.contractAbi,
                                     contractAddress: context.contractAddress
@@ -196,6 +199,7 @@ export const escrowMachine = {
                                 src: fromPromise( async ( { input } ) => {
 
                                     const {
+                                        dbg,
                                         arbiter,
                                         abi,
                                         contractAddress,
@@ -203,17 +207,17 @@ export const escrowMachine = {
 
 
                                     const browserProvider = new ethers.BrowserProvider( window.ethereum )
-                                    console.log( 'approve', { browserProvider } )
+                                    dbg && console.log( 'approve', { browserProvider } )
 
                                     const signer = await browserProvider.getSigner()
-                                    console.log( 'approve', { signer } )
+                                    dbg && console.log( 'approve', { signer } )
 
                                     const contract = new ethers.Contract(
                                         contractAddress,
                                         abi,
                                         signer
                                     )
-                                    console.log( 'approve', { contract } )
+                                    dbg && console.log( 'approve', { contract } )
 
                                     const tx = await contract.approve()
                                     const receipt = await tx.wait()
@@ -222,7 +226,7 @@ export const escrowMachine = {
                                     const res = await fetch( `/api/accounts` )
                                     const json = await res.json()
                                     const accounts = json.data
-                                    console.log( 'approve', { accounts } )
+                                    dbg && console.log( 'approve', { accounts } )
 
                                     return { accounts }
 
