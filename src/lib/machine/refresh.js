@@ -2,10 +2,12 @@ import { createNetworkProvider } from "$lib/model/provider.js";
 import { ethers } from "ethers";
 import { getAccounts, setRoleFromContract } from "$lib/model/account.js";
 
+const tag  ='refresh'
+
 export const createRefreshInput = ( { context } ) => ({
-    dbg: true,
+    dbg: context.dbg,
     abi: context.contractAbi,
-    contract:context.contract,
+    contract: context.contract,
     accounts: context.accounts,
     deployments: context.deployments,
 })
@@ -21,8 +23,6 @@ export const refresh = async ( { input } ) => {
         // accounts,
     } = input
 
-    const tag = 'refresh'
-
     dbg && console.log( tag, '-'.repeat( 8 ), performance.now() )
 
     const provider = createNetworkProvider()
@@ -33,13 +33,14 @@ export const refresh = async ( { input } ) => {
     const res = await fetch( `/api/accounts` )
     const json = await res.json()
     // const accounts = json.data
-    const tmpAccounts= await getAccounts( provider )
-    const accounts = tmpAccounts.map(account=>setRoleFromContract(account,contract))
+    const tmpAccounts = await getAccounts( provider )
+    const accounts = tmpAccounts.map( account => setRoleFromContract( account, contract ) )
     dbg && console.log( tag, { accounts } )
 
 
     // deployments
     dbg && console.log( tag, { deployments } )
+
     for ( let i = 0; i < deployments.length; i++ ) {
         const address = deployments[i].address
         dbg && console.log( tag, { address } )

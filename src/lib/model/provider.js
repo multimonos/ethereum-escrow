@@ -7,10 +7,8 @@ export const createNetworkProvider = () => {
     return new ethers.JsonRpcProvider( network.url )
 }
 
-export const provider = createNetworkProvider()
-
 export const createBrowserProvider = () => {
     if ( typeof window === 'undefined' ) return false
     if ( typeof window.ethereum === 'undefined' ) return false
-return new ethers.BrowserProvider( window.ethereum )
+    return new ethers.BrowserProvider( window.ethereum )
 }

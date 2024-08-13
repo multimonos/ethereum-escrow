@@ -1,9 +1,9 @@
 import { ethers } from "ethers";
-import { createDeployment } from "$lib/machine/escrow-helper.js";
+import { createDeployment } from "$lib/machine/machine-models.js";
 
 const tag = 'deploy'
 export const deployInput = ( { context } ) => ({
-    dbg: true,
+    dbg: context.dbg,
 
     // data
     arbiter: context.contract.arbiter,

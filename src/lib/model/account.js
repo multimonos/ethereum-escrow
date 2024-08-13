@@ -2,8 +2,6 @@ import { anvilAccounts } from "./anvil-accounts.js";
 import { toHex } from "ethereum-cryptography/utils";
 import { secp256k1 } from "ethereum-cryptography/secp256k1";
 import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
-// import { eq } from "drizzle-orm"
-// import { db } from "$lib/server/db.js";
 
 const model = sqliteTable( "accounts", {
     id: integer( "id", { mode: "number" } ).primaryKey( { autoIncrement: true } ),
@@ -45,7 +43,7 @@ export const getAccounts = async ( provider ) => {
 }
 
 
-export const setRoleFromContract = (  account,contract ) => {
+export const setRoleFromContract = ( account, contract ) => {
     if ( contract?.arbiter === account.address ) {
         account.role = 'arbiter'
     } else if ( contract?.beneficiary === account.address ) {

@@ -1,18 +1,26 @@
 import { assign, fromPromise, raise } from "xstate";
-import { findNetwork, setNetworkStatus } from "$lib/model/network.js";
+import { setNetworkStatus } from "$lib/model/network.js";
 import { deploy, deployInput } from "$lib/machine/deploy.js";
 import { approve, approveInput } from "$lib/machine/approve.js";
-import { createNetworkProvider } from "$lib/model/provider.js";
-import { createContract, createDeployment, createToast } from "$lib/machine/escrow-helper.js";
+import { createContract, createDeployment, createToast } from "$lib/machine/machine-models.js";
 import { gotEvent, logError, logState } from "$lib/machine/actions.js";
 import { createRefreshInput, refresh } from "$lib/machine/refresh.js";
-import { getAccounts, setRoleFromContract } from "$lib/model/account.js";
+import { setRoleFromContract } from "$lib/model/account.js";
+import { createPrepareInput, prepare } from "$lib/machine/prepare.js";
+
+export const Messages = {
+    ContractApproved: 'Approved',
+    ContractDeployed: 'Deployed',
+}
 
 export const escrowMachine = {
+
     id: 'escrow_machine',
+
     initial: 'preparing',
 
     context: ( { input } ) => ({
+        dbg: input.dbg || false,
         error: false,
         networkId: input.networkId,
         contractAddress: null,
@@ -27,10 +35,7 @@ export const escrowMachine = {
         contractBytecode: input.contractBytecode || null,
         accounts: [],
         toasts: [],
-        deployments: [
-            // createDeployment( { address: '0xasdfasdfasdfasd', owner: '0xasdfasdflkjasdflkjasdflkjasdf', approved: true } ),
-            // createDeployment( { address: '0xasdfasdfasdfasd', owner: '0xasdfasdflkjasdflkjasdflkjasdf', approved: false } ),
-        ]
+        deployments: []
     }),
 
     states: {
@@ -38,33 +43,8 @@ export const escrowMachine = {
         preparing: {
             entry: logState( 'preparing' ),
             invoke: {
-                input: ( { context } ) => ({
-                    networkId: context.networkId,
-                    contract: context.contract,
-                }),
-                src: fromPromise( async ( { input } ) => {
-
-                    const {
-                        networkId,
-                        contract,
-                    } = input
-
-                    // provider
-                    const provider = createNetworkProvider()
-
-                    // acounts
-                    const tmpAccounts = await getAccounts( provider )
-                    const accounts = tmpAccounts.map( account => setRoleFromContract( account, contract ) )
-
-                    // network
-                    const network = findNetwork( networkId )
-                    await setNetworkStatus( network )
-
-                    return {
-                        accounts,
-                        network,
-                    };
-                } ),
+                input: createPrepareInput,
+                src: fromPromise( prepare ),
                 onDone: {
                     target: 'running',
                     actions: [
@@ -139,8 +119,7 @@ export const escrowMachine = {
                                     accounts: ( { event, context } ) => {
                                         const { accounts } = context
                                         const contract = createContract( { ...event.contract } )
-                                        console.log( 'accounts', { accounts, contract } )
-                                        return accounts.map( ( acc, i ) => setRoleFromContract( acc, contract ) )
+                                        return accounts.map( account => setRoleFromContract( account, contract ) )
                                     }
                                 } )
                             ],
@@ -181,7 +160,7 @@ export const escrowMachine = {
                                             deployments: ( { context, event } ) =>
                                                 [ ...context.deployments, createDeployment( { ...event.output.deployment } ) ]
                                         } ),
-                                        raise( { type: 'toast', toast: { message: 'Contract Deployed!', type: 'success' } } )
+                                        raise( { type: 'toast', toast: { message: Messages.ContractDeployed, type: 'success' } } )
                                     ],
                                 },
                                 onError: {
@@ -206,7 +185,7 @@ export const escrowMachine = {
                                     target: 'approved',
                                     actions: [
                                         // assign( { accounts: ( { event } ) => event.output.accounts } ),
-                                        raise( { type: 'toast', toast: { message: 'Contract approved!', type: 'success' } } )
+                                        raise( { type: 'toast', toast: { message: Messages.ContractApproved, type: 'success' } } )
                                     ],
                                 },
                                 onError: {

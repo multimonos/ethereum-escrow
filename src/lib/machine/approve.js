@@ -3,10 +3,10 @@ import { ethers } from "ethers";
 const tag = 'approve'
 
 export const approveInput = ( { context } ) => ({
-    dbg: true,
+    dbg: context.dbg,
     arbiter: context.contract.arbiter,
     abi: context.contractAbi,
-    deployment: context.deployments.find(deployment=>deployment.address===context.contractAddress),
+    deployment: context.deployments.find( deployment => deployment.address === context.contractAddress ),
 })
 
 export const approve = async ( { input } ) => {
@@ -20,7 +20,7 @@ export const approve = async ( { input } ) => {
     } = input
 
     dbg && console.log( tag, '-'.repeat( 8 ), performance.now() )
-    console.log({deployment})
+    dbg && console.log( tag, { deployment } )
 
     // provider
     const browserProvider = new ethers.BrowserProvider( window.ethereum )
@@ -41,24 +41,15 @@ export const approve = async ( { input } ) => {
     try {
         // approve
         const txn = await contract.approve()
-        dbg && console.log(tag, { txn } )
+        dbg && console.log( tag, { txn } )
 
         const receipt = await txn.wait()
         dbg && console.log( tag, { receipt } )
 
-        // // update accounts
-        // const res = await fetch( `/api/accounts` )
-        // const json = await res.json()
-        // const accounts = json.data
-        // dbg && console.log( tag, { accounts } )
-
         // ux delay
         await new Promise( resolve => setTimeout( resolve, 1500 ) )
 
-       return {success:true}
-        // return {
-        //     accounts ,
-        // }
+        return { success: true }
 
     } catch ( err ) {
 

@@ -2,7 +2,7 @@ import { assert, beforeAll, describe, it } from "vitest";
 import { ethers } from "ethers";
 import { anvilAccounts } from "$lib/model/anvil-accounts.js";
 import manifest from "./Escrow.json"
-import { provider } from "$lib/model/provider.js";
+import { createNetworkProvider } from "$lib/model/provider.js";
 
 
 describe( `Escrow`, () => {
@@ -10,9 +10,11 @@ describe( `Escrow`, () => {
     let signer
     let arbiter
     let beneficiary
+    let provider
     const deposit = ethers.parseEther( '5' )
 
     beforeAll( async () => {
+        provider = createNetworkProvider()
         arbiter = new ethers.Wallet( anvilAccounts[1].privateKey, provider )
         beneficiary = new ethers.Wallet( anvilAccounts[2].privateKey, provider )
         signer = new ethers.Wallet( anvilAccounts[0].privateKey, provider )
