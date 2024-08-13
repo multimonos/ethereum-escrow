@@ -56,7 +56,7 @@ onMount( async () => {
                         <span
                             class:text-neutral={current===account.address.toLowerCase()}
                             class:text-base-100={current!==account.address.toLowerCase()}
-                            class="text-2xl icon-[solar--wallet-2-linear]"
+                            class="text-2xl icon-[solar--alt-arrow-right-bold]"
                         ></span>
 
                         <span
