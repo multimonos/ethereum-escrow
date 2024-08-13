@@ -25,17 +25,17 @@ onMount( async () => {
 
     window.ethereum.on( 'accountsChanged', accounts => {
         //https://eips.ethereum.org/EIPS/eip-1193#events
-        console.log( 'changed', JSON.stringify( accounts, null, 2 ) )
+        // console.log( 'changed', JSON.stringify( accounts, null, 2 ) )
         connected = accounts
         current = accounts[0] || false
     } )
     window.ethereum.on( 'disconnect', err => {
         //https://eips.ethereum.org/EIPS/eip-1193#events
-        console.log( 'disconnected', { err } )
+        // console.log( 'disconnected', { err } )
     } )
     window.ethereum.on( 'connect', chainId => {
         //https://eips.ethereum.org/EIPS/eip-1193#events
-        console.log( 'connected', { chainId } )
+        // console.log( 'connected', { chainId } )
     } )
 } )
 </script>

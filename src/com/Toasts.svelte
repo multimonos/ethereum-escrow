@@ -4,7 +4,7 @@ import { cubicOut } from "svelte/easing";
 
 export let toasts = []
 </script>
-<div class="toast toast-center toast-top z-50 min-w-64">
+<div class="toast z-50">
     {#each toasts as toast }
         <div out:slide={{ duration:400, axis:'y',easing:cubicOut}}
              class:alert-info={toast.type==='info'}
