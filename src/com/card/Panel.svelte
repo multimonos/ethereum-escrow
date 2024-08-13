@@ -1,7 +1,7 @@
 <script>
 export let title
 export let style = "default"
-let badgeClasses = "badge-ghots"
+let badgeClasses = "badge-ghost"
 $ : {
     if ( style === "success" ) badgeClasses = "badge-success"
     if ( style === "error" ) badgeClasses = "badge-error"

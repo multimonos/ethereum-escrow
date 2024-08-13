@@ -8,7 +8,7 @@ $:ether = formatter.format(
 )
 </script>
 
-<div class="flex items-center">
-    <span>{ ether }</span>
-    <span class="icon-[token--eth]"></span>
+<div class="flex items-center gap-x-1">
+    <span class="text-base-content icon-[token--eth]"></span>
+    <span >{ ether }</span>
 </div>
