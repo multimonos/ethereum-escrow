@@ -9,8 +9,9 @@
 		"preview": "vite preview",
 		"test:unit": "vitest --passWithNoTests",
 		"test:e2e": "npx cypress open --e2e --browser=electron",
+		"test:escrow": "vitest watch ./src/sol/*.test.js",
 		"sol:test": "forge test --mc 'Escrow*' --watch -vv",
-		"sol:assets": "cp ./out/Escrow.sol/*.json ./src/sol",
+		"sol:assets": "forge clean && forge build && cp ./out/Escrow.sol/*.json ./src/sol",
 		"send:ether": "cast send $ANVIL1_ADDRESS --value=25ether --private-key=$ANVIL0_PKEY"
 	},
 	"devDependencies": {
