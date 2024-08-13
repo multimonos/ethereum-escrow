@@ -15,26 +15,13 @@ const model = sqliteTable( "accounts", {
 const createPublicKey = ( privateKey ) =>
     toHex( secp256k1.getPublicKey( privateKey, false ) )
 
-// export const resetAccounts = async () => {
-//
-//     await db.delete( model )
-//
-//     const data = anvilAccounts.map( x => ({
-//         id: x.id,
-//         address: x.address,
-//         balance: x.balance,
-//         publicKey: createPublicKey( x.privateKey )
-//     }) )
-//     const rs = await db.insert( model ).values( data )
-// }
-
 export const createAccount = (
     {
         address = "",
         balance = 0,
         role = "",
-        connected=false,
-        active=false,
+        connected = false,
+        active = false,
     } = {} ) => (
     {
         type: "account",
@@ -56,37 +43,18 @@ export const getAccounts = async ( provider ) => {
 
     return accounts
 }
-//
-// export const accountFromAddress = async ( address ) => {
-//     const rs = await db.select()
-//         .from( model )
-//         .where( eq( model.address, address ) )
-//         .limit( 1 )
-//
-//     return rs.length === 1
-//         ? createAccount( { ...rs[0] } )
-//         : false
-// }
-//
-// export const accountFromPublicKey = async ( publicKey ) => {
-//     const rs = await db.select()
-//         .from( model )
-//         .where( eq( model.publicKey, publicKey ) )
-//         .limit( 1 )
-//
-//     return rs.length === 1
-//         ? createAccount( { ...rs[0] } )
-//         : false
-// }
-//
-// export const setAccountBalance = async ( account, newBalance ) => {
-//     const rs = await db.update( model )
-//         .set( { balance: newBalance } )
-//         .where( eq( model.address, account.address ) )
-// }
-//
-// export const privateKeyFor = address => {
-//     // dangerous !!!
-//     const account = anvilAccounts.find( x => x.address === address )
-//     return account ? account.privateKey : false
-// }
+
+
+export const setRoleFromContract = (  account,contract ) => {
+    if ( contract?.arbiter === account.address ) {
+        account.role = 'arbiter'
+    } else if ( contract?.beneficiary === account.address ) {
+        account.role = 'beneficiary'
+    } else if ( contract?.depositor === account.address ) {
+        account.role = 'depositor'
+    } else {
+        account.role = ''
+    }
+    return account
+}
+
