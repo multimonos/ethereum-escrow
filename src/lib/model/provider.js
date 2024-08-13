@@ -8,3 +8,9 @@ const createProvider = () => {
 }
 
 export const provider = createProvider()
+
+export const createBrowserProvider = () => {
+    if ( typeof window === 'undefined' ) return false
+    if ( typeof window.ethereum === 'undefined' ) return false
+return new ethers.BrowserProvider( window.ethereum )
+}
