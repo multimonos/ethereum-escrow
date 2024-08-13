@@ -1,12 +1,9 @@
 import { ethers } from "ethers";
-import { provider } from "$lib/model/provider.js";
+import { createDeployment } from "$lib/machine/escrow-helper.js";
 
 const tag = 'deploy'
 export const deployInput = ( { context } ) => ({
     dbg: true,
-
-    // core
-    provider: context.provider,
 
     // data
     arbiter: context.contract.arbiter,
@@ -27,15 +24,14 @@ export const deploy = async ( { input } ) => {
         amount,
         abi,
         bytecode,
-        provider,
     } = input
 
     dbg && console.log( tag, '-'.repeat( 8 ), performance.now() )
     dbg && console.log( tag, { arbiter, beneficiary, amount } )
 
     // provider
-    // const provider = new ethers.BrowserProvider( window.ethereum )
-    dbg && console.log( tag, {  provider } )
+    const provider = new ethers.BrowserProvider( window.ethereum )
+    dbg && console.log( tag, { provider } )
 
     // signer
     const signer = await provider.getSigner()
@@ -62,18 +58,23 @@ export const deploy = async ( { input } ) => {
     dbg && console.log( tag, { receipt } )
 
     // get contract balance
-    const contractBalance = await provider.getBalance( contract.target )
-    dbg && console.log( tag, { contractBalance} )
+    const balance = await provider.getBalance( contract.target )
+    dbg && console.log( tag, { balance } )
 
     // contract address
     const contractAddress = contract.target
     dbg && console.log( tag, { contractAddress } )
 
+    const deployment = createDeployment({
+        address:contract.target,
+        owner: signer.address,
+        balance: balance.toString(),
+    })
     // ux delay
     await new Promise( resolve => setTimeout( resolve, 1500 ) )
 
     return {
-        contractBalance,
+        deployment,
         contractAddress,
     }
 }

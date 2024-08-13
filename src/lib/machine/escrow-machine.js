@@ -2,79 +2,67 @@ import { assign, fromPromise, raise } from "xstate";
 import { findNetwork, setNetworkStatus } from "$lib/model/network.js";
 import { deploy, deployInput } from "$lib/machine/deploy.js";
 import { approve, approveInput } from "$lib/machine/approve.js";
-import { createBrowserProvider } from "$lib/model/provider.js";
-
-const createToast = ( { type = "info", message = "" } = {} ) => ({
-    type,
-    message,
-    "expiresAt": performance.now() + 5000
-})
-
-export const gotEvent = ( { event } ) => {
-    console.log( `got '${event.type}'`, event )
-}
-export const logState = ( name ) => () => {
-    console.log( 'state :', name )
-}
-export const delay = ms =>
-    new Promise( resolve => setTimeout( resolve, ms ) )
+import { createNetworkProvider } from "$lib/model/provider.js";
+import { createContract, createDeployment, createToast } from "$lib/machine/escrow-helper.js";
+import { gotEvent, logError, logState } from "$lib/machine/actions.js";
+import { createRefreshInput, refresh } from "$lib/machine/refresh.js";
+import { getAccounts, setRoleFromContract } from "$lib/model/account.js";
 
 export const escrowMachine = {
     id: 'escrow_machine',
-    initial: 'loading',
+    initial: 'preparing',
 
     context: ( { input } ) => ({
         error: false,
         networkId: input.networkId,
         contractAddress: null,
-        contractBalance: null,
         contract: {
+            depositor: "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
             arbiter: "",
             beneficiary: "",
             amount: 0
         },
-        depositorIndex: 0,
         network: null,
         contractAbi: input.contractAbi || null,
         contractBytecode: input.contractBytecode || null,
         accounts: [],
-        provider: null,
         toasts: [],
+        deployments: [
+            // createDeployment( { address: '0xasdfasdfasdfasd', owner: '0xasdfasdflkjasdflkjasdflkjasdf', approved: true } ),
+            // createDeployment( { address: '0xasdfasdfasdfasd', owner: '0xasdfasdflkjasdflkjasdflkjasdf', approved: false } ),
+        ]
     }),
 
     states: {
 
-
-        loading: {
-            entry: [ logState( 'loading' ) ],
+        preparing: {
+            entry: logState( 'preparing' ),
             invoke: {
                 input: ( { context } ) => ({
                     networkId: context.networkId,
-                    depositorIndex: context.depositorIndex,
+                    contract: context.contract,
                 }),
                 src: fromPromise( async ( { input } ) => {
+
                     const {
-                        depositorIndex,
                         networkId,
+                        contract,
                     } = input
 
                     // provider
-                    const provider = createBrowserProvider()
+                    const provider = createNetworkProvider()
 
-                    // accounts
-                    const res = await fetch( `/api/accounts` )
-                    const json = await res.json()
-                    const accounts = json.data
-                    accounts[depositorIndex].role = 'depositor'
+                    // acounts
+                    const tmpAccounts = await getAccounts( provider )
+                    const accounts = tmpAccounts.map( account => setRoleFromContract( account, contract ) )
 
                     // network
                     const network = findNetwork( networkId )
                     await setNetworkStatus( network )
-                    // init
+
                     return {
                         accounts,
                         network,
-                        provider,
                     };
                 } ),
                 onDone: {
@@ -84,7 +72,6 @@ export const escrowMachine = {
                         assign( {
                             accounts: ( { event } ) => event.output.accounts,
                             network: ( { event } ) => event.output.network,
-                            provider: ( { event } ) => event.output.provider,
                         } )
                     ]
                 }
@@ -94,12 +81,10 @@ export const escrowMachine = {
         running: {
             type: 'parallel',
             states: {
-
                 toasts: {
                     initial: 'idle',
                     states: {
                         idle: {
-                            // entry: [ logState( 'toasts.idle' ) ],
                             always: {
                                 target: 'clearing',
                                 guard: ( { context } ) => context.toasts.length > 0
@@ -107,28 +92,17 @@ export const escrowMachine = {
                         },
                         clearing: {
                             entry: [
-                                // logState( 'toasts.clearing' ),
                                 assign( {
-                                    toasts: ( { context } ) => {
-                                        const mark = performance.now()
-                                        const toasts = context.toasts.filter( t => t.expiresAt > mark )
-                                        return toasts
-                                    }
+                                    toasts: ( { context } ) => context.toasts.filter( t => t.expiresAt > performance.now() )
                                 } )
                             ],
-                            after: {
-                                300: {
-                                    target: 'idle'
-                                }
-                            }
+                            after: { 300: { target: 'idle' } }
                         }
                     },
                     on: {
                         toast: {
                             actions: assign( {
-                                toasts: ( { context, event } ) => {
-                                    return [ ...context.toasts, createToast( { ...event.toast } ) ]
-                                }
+                                toasts: ( { context, event } ) => [ ...context.toasts, createToast( { ...event.toast } ) ]
                             } )
                         }
                     }
@@ -161,33 +135,12 @@ export const escrowMachine = {
                             actions: [
                                 gotEvent,
                                 assign( {
-                                    contract: ( { event } ) => {
-                                        const createContract = ( { arbiter = "", beneficiary = "", amount = 0 } = {} ) => ({
-                                            arbiter,
-                                            beneficiary,
-                                            amount: parseFloat( amount ),
-                                        })
-                                        console.log( event.contract )
-                                        return createContract( { ...event.contract } )
-                                    },
+                                    contract: ( { event } ) => createContract( { ...event.contract } ),
                                     accounts: ( { event, context } ) => {
                                         const { accounts } = context
-                                        const { contract } = event
+                                        const contract = createContract( { ...event.contract } )
                                         console.log( 'accounts', { accounts, contract } )
-                                        const naccounts = accounts.map( ( acc, i ) => {
-                                            if ( contract.arbiter && contract.arbiter === acc.address ) {
-                                                acc.role = 'arbiter'
-                                            } else if ( contract.beneficiary && contract.beneficiary === acc.address ) {
-                                                acc.role = 'beneficiary'
-                                            } else if ( i === context.depositorIndex ) {
-                                                acc.role = 'depositor'
-                                            } else {
-                                                acc.role = ""
-                                            }
-                                            return acc
-                                        } )
-
-                                        return accounts
+                                        return accounts.map( ( acc, i ) => setRoleFromContract( acc, contract ) )
                                     }
                                 } )
                             ],
@@ -197,10 +150,10 @@ export const escrowMachine = {
                     },
                     states: {
                         validating: {
-                            entry: [ logState( 'validating' ) ],
                             always: {
                                 guard: ( { context } ) => {
-                                    return context.contract.arbiter !== ''
+                                    return context.contract.depositor !== ''
+                                        && context.contract.arbiter !== ''
                                         && context.contract.beneficiary !== ''
                                         && context.contract.amount > 0
                                 },
@@ -210,85 +163,88 @@ export const escrowMachine = {
                         valid: {
                             on: {
                                 deploy: {
-                                    actions: () => console.log( 'deploy' ),
+                                    actions: gotEvent,
                                     target: 'deploying',
                                 }
                             }
                         },
                         deploying: {
+                            entry: logState( 'deploying' ),
                             invoke: {
                                 input: deployInput,
                                 src: fromPromise( deploy ),
                                 onDone: {
-                                    actions: [
-                                        assign( { contractAddress: ( { event } ) => event.output.contractAddress } ),
-                                        raise( { type: 'toast', toast: { message: 'Deployed', type: 'success' } } )
-                                    ],
                                     target: 'deployed',
+                                    actions: [
+                                        assign( {
+                                            contractAddress: ( { event } ) => event.output.contractAddress,
+                                            deployments: ( { context, event } ) =>
+                                                [ ...context.deployments, createDeployment( { ...event.output.deployment } ) ]
+                                        } ),
+                                        raise( { type: 'toast', toast: { message: 'Contract Deployed!', type: 'success' } } )
+                                    ],
                                 },
                                 onError: {
                                     target: 'validating',
                                     actions: [
-                                        err => console.error( 'deploying', { err } ),
+                                        logError( 'deploying' ),
                                         assign( { error: ( { event } ) => event.error.message } ),
                                     ],
                                 }
                             }
-
                         },
                         deployed: {
-                            entry: [
-                                logState( 'deployed' ),
-                            ],
-                            on: {
-                                approve: {
-                                    actions: [
-                                        () => console.log( 'approved' ),
-                                    ],
-                                    target: 'approving'
-                                }
-                            }
+                            entry: logState( 'deployed' ),
+                            on: { approve: { actions: gotEvent, target: 'approving' } }
                         },
                         approving: {
+                            entry: logState( 'approving' ),
                             invoke: {
                                 input: approveInput,
                                 src: fromPromise( approve ),
                                 onDone: {
-                                    actions: [
-                                        assign( { accounts: ( { event } ) => event.output.accounts } ),
-                                        raise( { type: 'toast', toast: { message: 'Approved', type: 'success' } } )
-                                    ],
                                     target: 'approved',
+                                    actions: [
+                                        // assign( { accounts: ( { event } ) => event.output.accounts } ),
+                                        raise( { type: 'toast', toast: { message: 'Contract approved!', type: 'success' } } )
+                                    ],
                                 },
                                 onError: {
                                     target: 'deployed',
                                     actions: [
-                                        err => console.error( 'approving', { err } ),
+                                        logError( 'approving' ),
                                         assign( { error: ( { event } ) => event.error.message } ),
                                     ],
                                 }
                             }
                         },
                         approved: {
-                            entry: [
-                                logState( 'approved' ),
-                            ],
+                            entry: logState( 'approved' ),
+                            invoke: {
+                                input: createRefreshInput,
+                                src: fromPromise( refresh ),
+                                onDone: {
+                                    actions: [
+                                        gotEvent,
+                                        assign( {
+                                            accounts: ( { event } ) => event.output.accounts,
+                                            deployments: ( { event } ) => event.output.deployments,
+                                        } )
+                                    ]
+                                }
+                            }
                         }
                     }
                 },
+
+
                 network: {
                     initial: 'idle',
                     states: {
                         idle: {
-                            entry: [
-                                // logState( 'network.idle' )
-                            ],
                             after: { 30000: { target: 'refreshing' } }
                         },
                         refreshing: {
-                            entry: [
-                                // logState( 'network.refreshing' )
-                            ],
                             invoke: {
                                 input: ( { context } ) => ({ network: context.network }),
                                 src: fromPromise( async ( { input } ) => {
