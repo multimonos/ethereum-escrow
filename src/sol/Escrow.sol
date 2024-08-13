@@ -5,7 +5,7 @@ contract EscrowEvents {
     event Approved(uint256 balance);
 }
 
-contract Escrow is EscrowEvents {
+contract Escrow {
     // --- errors ---
     error ArbiterOnly();
 
@@ -14,6 +14,9 @@ contract Escrow is EscrowEvents {
     address public beneficiary;
     address public arbiter;
     bool public isApproved;
+
+    // --- events ---
+    event Approved(uint256 balance);
 
     // --- modifiers ---
     modifier onlyArbiter {

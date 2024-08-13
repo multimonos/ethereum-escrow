@@ -2,10 +2,10 @@
 pragma solidity 0.8.20;
 
 import {Test, console} from "forge-std/Test.sol";
-import {Escrow,EscrowEvents}from "./Escrow.sol";
+import {Escrow, EscrowEvents}from "./Escrow.sol";
 
 
-contract EscrowTest is Test,EscrowEvents {
+contract EscrowTest is Test, EscrowEvents {
 
     Escrow public escrow;
 
